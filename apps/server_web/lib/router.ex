@@ -4,7 +4,8 @@ defmodule Web.Router do
       _: [
         {"/auth", Web.Resources.Auth, []},
         {"/users", Web.Resources.Users, []},
-        {"/users/:user", Web.Resources.User, []}
+        {"/users/:user", Web.Resources.User, []},
+        {"/health", Web.Resources.Health, []}
       ]
     ]
   end
