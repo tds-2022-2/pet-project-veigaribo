@@ -26,4 +26,9 @@ defmodule Web.ServerWeb.Application do
     opts = [strategy: :one_for_one, name: ServerWeb.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  @impl true
+  def prep_stop(_state) do
+    :cowboy.stop_listener(:my_http_listener)
+  end
 end
