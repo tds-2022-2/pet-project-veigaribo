@@ -59,15 +59,22 @@ defmodule Web.Resources.Auth do
   end
 
   defp post3(req, state, username, password) do
+    cond do
+      not is_binary(password) -> {false, error_password_not_string(req), state}
+      true -> post4(req, state, username, password)
+    end
+  end
+
+  defp post4(req, state, username, password) do
     result = Core.Auth.login(username, password)
 
     case result do
-      {:ok, session} -> post4(req, state, session)
+      {:ok, session} -> post5(req, state, session)
       {:error, _} -> {false, error_login_failed(req), state}
     end
   end
 
-  defp post4(req, state, {id, _username, valid_until}) do
+  defp post5(req, state, {id, _username, valid_until}) do
     response_map = %{"token" => id, "valid_until" => valid_until}
     response = Jason.encode!(response_map)
 
@@ -111,6 +118,11 @@ defmodule Web.Resources.Auth do
 
   defp error_invalid_data(req) do
     map = %{"error" => "Invalid data. Expected username and password."}
+    :cowboy_req.set_resp_body(Jason.encode!(map), req)
+  end
+
+  defp error_password_not_string(req) do
+    map = %{"error" => "Password must be a string."}
     :cowboy_req.set_resp_body(Jason.encode!(map), req)
   end
 
