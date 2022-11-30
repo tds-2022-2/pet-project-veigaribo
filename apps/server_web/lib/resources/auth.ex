@@ -41,7 +41,7 @@ defmodule Web.Resources.Auth do
     end
   end
 
-  defp post(req, state) do
+  def post(req, state) do
     {:ok, body, req1} = :cowboy_req.read_body(req)
     parse_result = Jason.decode(body, strings: :copy)
 
@@ -67,7 +67,7 @@ defmodule Web.Resources.Auth do
     end
   end
 
-  def post4(req, state, {id, _username, valid_until}) do
+  defp post4(req, state, {id, _username, valid_until}) do
     response_map = %{"token" => id, "valid_until" => valid_until}
     response = Jason.encode!(response_map)
 
@@ -88,7 +88,7 @@ defmodule Web.Resources.Auth do
     end
   end
 
-  defp get(req, state) do
+  def get(req, state) do
     in_state = List.keyfind(state, :found_user, 0)
 
     case in_state do

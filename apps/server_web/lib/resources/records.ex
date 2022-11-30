@@ -57,7 +57,7 @@ defmodule Web.Resources.Records do
     end
   end
 
-  defp post(req, state) do
+  def post(req, state) do
     {:ok, body, req1} = :cowboy_req.read_body(req)
     parse_result = Jason.decode(body, strings: :copy)
 
@@ -84,7 +84,7 @@ defmodule Web.Resources.Records do
     end
   end
 
-  def post4(req, state, id, username) do
+  defp post4(req, state, id, username) do
     req1 =
       %{"id" => id, "username" => username}
       |> Jason.encode!()
@@ -95,7 +95,7 @@ defmodule Web.Resources.Records do
     {{:created, resource_url}, req1, state}
   end
 
-  defp get(req, state) do
+  def get(req, state) do
     records = Core.Record.get()
     get2(req, state, records)
   end

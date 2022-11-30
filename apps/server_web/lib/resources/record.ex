@@ -69,7 +69,7 @@ defmodule Web.Resources.Record do
     end
   end
 
-  defp get(req, state) do
+  def get(req, state) do
     in_state = List.keyfind(state, :found_record, 0)
 
     case in_state do

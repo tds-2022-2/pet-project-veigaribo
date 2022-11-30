@@ -17,8 +17,8 @@ defmodule Web.Resources.User do
     result = Web.Auth.is_user(req, username)
 
     case result do
-      {:ok, true} -> {true, req, state}
-      {:ok, false} -> {{false, "Bearer"}, req, state}
+      {:ok, _session, true} -> {true, req, state}
+      {:ok, _session, false} -> {{false, "Bearer"}, req, state}
       {:error, _} -> {{false, "Bearer"}, req, state}
     end
   end
@@ -54,7 +54,7 @@ defmodule Web.Resources.User do
     end
   end
 
-  defp put(req, state) do
+  def put(req, state) do
     {:ok, body, req1} = :cowboy_req.read_body(req)
     parse_result = Jason.decode(body, strings: :copy)
 
@@ -81,7 +81,7 @@ defmodule Web.Resources.User do
     end
   end
 
-  def put4(req, state, username, password) do
+  defp put4(req, state, username, password) do
     result = Core.User.update({username, password})
 
     case result do
@@ -112,7 +112,7 @@ defmodule Web.Resources.User do
     end
   end
 
-  def patch3(req, state, username, data) do
+  defp patch3(req, state, username, data) do
     result = Core.User.update(username, data)
 
     case result do
@@ -132,7 +132,7 @@ defmodule Web.Resources.User do
     end
   end
 
-  defp get(req, state) do
+  def get(req, state) do
     in_state = List.keyfind(state, :found_user, 0)
 
     case in_state do

@@ -31,8 +31,12 @@ defmodule Web.Auth do
     result = authenticate(req)
 
     case result do
-      {:ok, {_id, username1, _valid_until}} -> {:ok, username == username1}
-      {:error, reason} -> {:error, reason}
+      {:ok, session} ->
+        {_id, username1, _valid_until} = session
+        {:ok, session, username == username1}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 end

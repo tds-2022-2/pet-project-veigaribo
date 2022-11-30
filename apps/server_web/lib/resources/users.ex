@@ -26,7 +26,7 @@ defmodule Web.Resources.Users do
     end
   end
 
-  defp post(req, state) do
+  def post(req, state) do
     {:ok, body, req1} = :cowboy_req.read_body(req)
     parse_result = Jason.decode(body, strings: :copy)
 
@@ -60,7 +60,7 @@ defmodule Web.Resources.Users do
     end
   end
 
-  def post5(req, state, username) do
+  defp post5(req, state, username) do
     base_url = Application.fetch_env!(:server_web, :base_url)
     resource_url = Path.join([base_url, "/users/", username])
     {{:created, resource_url}, req, state}

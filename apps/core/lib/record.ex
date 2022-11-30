@@ -35,6 +35,12 @@ defmodule Core.Record do
     end)
   end
 
+  def get_by_user(username) do
+    Storage.transaction(fn ->
+      Storage.get_records_by_user(username)
+    end)
+  end
+
   def delete(id) do
     Storage.transaction(fn ->
       Storage.delete_record(id)

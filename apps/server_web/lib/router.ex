@@ -6,6 +6,7 @@ defmodule Web.Router do
         {"/users", Web.Resources.Users, []},
         {"/users/:user", Web.Resources.User, []},
         {"/records", Web.Resources.Records, []},
+        {"/records/by/:user", Web.Resources.UserRecords, []},
         {"/records/:record", Web.Resources.Record, []},
         {"/health", Web.Resources.Health, []}
       ]
