@@ -84,6 +84,16 @@ defmodule Storage do
     :mnesia.write({:records, id, username, score})
   end
 
+  def get_records() do
+    # idk y select and match_object don't work
+    result = :mnesia.foldl(&[&1 | &2], [], :records)
+
+    Enum.map(result, fn record ->
+      {:records, id, username, score} = record
+      {id, username, score}
+    end)
+  end
+
   def get_record(id) do
     result = :mnesia.read(:records, id)
 
@@ -91,6 +101,10 @@ defmodule Storage do
       [{:records, ^id, username, score}] -> {:found, {id, username, score}}
       _ -> :not_found
     end
+  end
+
+  def delete_record(id) do
+    :mnesia.delete({:records, id})
   end
 
   def get_records_by_user(username) do
