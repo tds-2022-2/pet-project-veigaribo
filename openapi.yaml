@@ -1,0 +1,508 @@
+---
+openapi: 3.0.3
+
+info:
+  title: Pet de TDS
+  description: |-
+    Serviço para gerenciamento de records de score de alguma coisa. Scores não
+    são validados de nenhuma forma.
+  contact:
+    email: veigo@veigo.dev
+  license:
+    name: WTFPL
+    url: http://www.wtfpl.net/txt/copying/
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8080/
+
+tags:
+  - name: users
+  - name: auth
+  - name: records
+  - name: health
+
+paths:
+  /users:
+    post:
+      tags:
+        - users
+      description: Register a new user.
+      requestBody:
+        description: User data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPutUser'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid data supplied. See error message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    options:
+      tags:
+        - users
+      description: Check available methods.
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "OPTIONS, POST"
+              example: "OPTIONS, POST"
+  /users/{username}:
+    parameters:
+      - name: username
+        in: path
+        description: Your name
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - users
+      description: Get information on yourself.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResult'
+        '401':
+          description: Invalid token or trying to access data of another user
+        '404':
+          description: User not found
+      security:
+        - login_required: []
+    put:
+      tags:
+        - users
+      description: Update your user data. Changing the username is not allowed.
+      requestBody:
+        description: User data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPutUser'
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          description: Invalid token or trying to change data of another user
+        '404':
+          description: User not found
+      security:
+        - login_required: []
+    patch:
+      tags:
+        - users
+      description: Update your user data. Changing the username is not allowed.
+      requestBody:
+        description: User data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchUser'
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          description: Invalid token or trying to change data of another user
+        '404':
+          description: User not found
+      security:
+        - login_required: []
+    delete:
+      tags:
+        - users
+      description: Delete your user.
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          description: Invalid token or trying to delete another user
+        '404':
+          description: User not found
+      security:
+        - login_required: []
+    options:
+      tags:
+        - users
+      description: Check available methods
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "DELETE, GET, OPTIONS, PATCH, PUT"
+              example: "DELETE, GET, OPTIONS, PATCH, PUT"
+  /auth:
+    post:
+      tags:
+        - auth
+      summary: Authenticate
+      description: Authenticate.
+      requestBody:
+        description: Login data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAuth'
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostAuthResult'
+        '400':
+          description: Invalid data supplied. See error message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - auth
+      description: Retrieve authentication information.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAuthResult'
+        '404':
+          description: Not authenticated
+      security:
+        - login_required: []
+    options:
+      tags:
+        - auth
+      description: Check available methods
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "GET, OPTIONS, POST"
+              example: "GET, OPTIONS, POST"
+  /records:
+    post:
+      tags:
+        - records
+      description: Register a new record.
+      requestBody:
+        description: Record data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPutRecord'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid data supplied. See error message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid token
+      security:
+        - login_required: []
+    get:
+      tags:
+        - records
+      description: Get all records. No pagination.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRecordsResult'
+    options:
+      tags:
+        - records
+      description: Check available methods.
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "GET, OPTIONS, POST"
+              example: "GET, OPTIONS, POST"
+  /records/by/{username}:
+    parameters:
+      - name: username
+        in: path
+        description: Name of user from which to get records
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - records
+      description: |-
+        Register a new record. Behaves the same as posting to `/records`.
+      requestBody:
+        description: Record data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPutRecord'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid data supplied. See error message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid token or trying to register to another user
+        '404':
+          description: User not found
+      security:
+        - login_required: []
+    get:
+      tags:
+        - records
+      description: Get all records from user. No pagination.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRecordsResult'
+        '404':
+          description: User not found
+    options:
+      tags:
+        - records
+      description: Check available methods.
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "GET, OPTIONS, POST"
+              example: "GET, OPTIONS, POST"
+  /records/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Record ID
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - records
+      description: Get record data.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRecordResult'
+        '404':
+          description: Record not found
+    delete:
+      tags:
+        - records
+      description: Delete record.
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          description: Invalid token or trying to delete record of another user
+        '404':
+          description: Record not found
+      security:
+        - login_required: []
+    options:
+      tags:
+        - records
+      description: Check available methods.
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "DELETE, GET, OPTIONS"
+              example: "DELETE, GET, OPTIONS"
+  /health:
+    get:
+      tags:
+        - health
+      description: Check if server is ok.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHealthResult'
+    options:
+      tags:
+        - health
+      description: Check available methods.
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Allow:
+              description: Allowed methods
+              schema:
+                type: array
+                const: "GET, OPTIONS"
+              example: "GET, OPTIONS"
+
+components:
+  schemas:
+    PostPutUser:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "veiga"
+        password:
+          type: string
+          example: "123"
+    PatchUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "veiga"
+        password:
+          type: string
+          example: "123"
+    GetUserResult:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "veiga"
+        password:
+          type: "null"
+          example: null
+    PostAuth:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          # may be any type actually
+          example: "veiga"
+        password:
+          type: string
+          example: "123"
+    PostAuthResult:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        valid_until:
+          type: number
+          format: int64
+          example: 1669790811417
+    GetAuthResult:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        username:
+          type: string
+          example: "veiga"
+        valid_until:
+          type: number
+          format: int64
+          example: 1669790811417
+    PostPutRecord:
+      type: object
+      required:
+        - score
+      properties:
+        score:
+          # any type as well
+          example: 300
+    PostRecordResult:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        username:
+          type: string
+          example: "veiga"
+    GetRecordsResult:
+      type: array
+      items:
+        $ref: '#/components/schemas/GetRecordResult'
+    GetRecordResult:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        score:
+          example: 300
+        username:
+          type: string
+          example: "veiga"
+    GetHealthResult:
+      type: object
+      properties:
+        status:
+          type: string
+          const: "fine"
+          example: "fine"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "An user with that name already exists."
+
+  securitySchemes:
+    login_required:
+      type: http
+      scheme: Bearer
